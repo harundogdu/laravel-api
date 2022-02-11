@@ -14,12 +14,26 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Product::all(), 200);
+        //return response()->json(Product::all(), 200);
         //return response()->json(Product::paginate(10), 200);
         //return response()->json(['count' => Product::count()], 200);
 
+        $offset = $request->has('offset') ? $request->offset : 0;
+        $limit = $request->has('limit') ? $request->limit : 10;
+
+        $qb = Product::query()->with('category');
+        if ($request->has('q')) {
+            $qb->where('name', 'like', '%' . $request->q . '%');
+        }
+        if ($request->has('sort')) {
+            $qb->orderBy($request->query('sortBy'), $request->query('sort', 'desc'));
+        }
+
+        $products = $qb->offset($offset)->limit($limit)->get();
+
+        return response()->json($products, 200);
     }
 
     /**
@@ -108,7 +122,7 @@ class ProductController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
