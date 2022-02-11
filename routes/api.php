@@ -22,4 +22,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::apiResources([
     "products" => \App\Http\Controllers\Api\ProductController::class,
     "categories" => \App\Http\Controllers\Api\CategoryController::class,
+    "users" => \App\Http\Controllers\Api\UserController::class,
 ]);
