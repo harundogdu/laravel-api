@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Resources\UserCollection;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -15,7 +18,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::paginate(10);
+        $users = User::all();
+        $users->each->setAppends(['full_name']);
+        return response()->json($users, 200);
     }
 
     /**
@@ -24,7 +29,7 @@ class UserController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(UserStoreRequest $request)
     {
         try {
             $user = new User();
@@ -94,5 +99,35 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function custom()
+    {
+        /*
+         * $user = User::find(2);
+         * return new UserResource($user);
+         * {
+         *  "data": {
+         *      "id": 2,
+         *      "name": "Mariam Fritsch",
+         *      "first_name": "Jailyn",
+         *      "last_name": "Koelpin"
+         *    }
+         * }
+         */
+
+        //        $user = User::all();
+        //        return UserResource::collection($user);
+
+//        $users = User::all();
+//        return new UserCollection($users);
+        //  UserCollection dosyasını oluşturarak dönen veriyi düzenleyebiliriz.
+
+        $users = User::all();
+        return UserResource::collection($users)->additional([
+            'meta' => [
+                "total" => $users->count(),
+            ]
+        ]);
     }
 }

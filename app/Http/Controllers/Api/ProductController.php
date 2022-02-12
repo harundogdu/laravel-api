@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProductWithCategoriesResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-class ProductController extends Controller
+class ProductController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -33,17 +35,9 @@ class ProductController extends Controller
 
         $products = $qb->offset($offset)->limit($limit)->get();
 
-        return response()->json($products, 200);
-    }
+        $products = $products->makeHidden(['created_at', 'updated_at']);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return $this->apiResponse(ResultType::SUCCESS, $products, 'Products fetched successfully', 200);
     }
 
     /**
@@ -54,17 +48,21 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $product = new Product();
-        $product->name = $request->name;
-        $product->slug = Str::slug($request->name);
-        $product->description = $request->description;
-        $product->price = $request->price;
-        $product->amount = $request->amount;
-        $product->image = $request->image;
-        $product->category_id = mt_rand(1, 30);
-        $product->save();
+        try {
+            $product = new Product();
+            $product->name = $request->name;
+            $product->slug = Str::slug($request->name);
+            $product->description = $request->description;
+            $product->price = $request->price;
+            $product->amount = $request->amount;
+            $product->image = $request->image;
+            $product->category_id = mt_rand(1, 30);
+            $product->save();
 
-        return response()->json($product, 201);
+            return $this->apiResponse(ResultType::SUCCESS, $product, "Product was created successfully", 201);
+        } catch (\Exception $exception) {
+            return $this->apiResponse(ResultType::SUCCESS, null, $exception->getMessage(), 500);
+        }
     }
 
     /**
@@ -77,19 +75,9 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
         if ($product)
-            return response()->json($product, 200);
+            return $this->apiResponse(ResultType::SUCCESS, new ProductResource($product), "Product was fetched successfully", 200);
         else
-            return response()->json(['message' => 'Product not found'], 404);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
+            return $this->apiResponse(ResultType::SUCCESS, null, "Product not found", 404);
 
     }
 
@@ -112,9 +100,9 @@ class ProductController extends Controller
             $product->image = $request->image;
             $product->category_id = $request->category_id;
             $product->save();
-            return response()->json($product, 200);
+            return $this->apiResponse(ResultType::SUCCESS, $product, "Product was updated successfully", 200);
         } else {
-            return response()->json(['message' => 'Product not found'], 404);
+            return $this->apiResponse(ResultType::SUCCESS, null, "Product not found", 404);
         }
     }
 
@@ -129,9 +117,46 @@ class ProductController extends Controller
         $product = Product::find($id);
         if ($product) {
             $product->delete();
-            return response()->json(['message' => 'Product deleted'], 200);
+            return $this->apiResponse(ResultType::SUCCESS, null, "Product was deleted successfully", 200);
         } else
-            return response()->json(['message' => 'Product not found'], 404);
+            return $this->apiResponse(ResultType::SUCCESS, null, "Product not found", 404);
+    }
 
+    public function custom()
+    {
+        // return Product::pluck('id', 'name'); Tekli Kolon Çekmek İçin
+        //return Product::select('id', 'name', 'price')->orderBy('price','DESC')->take(10)->get(); // Birden Fazla Kolon Çekmek İçin
+        return Product::selectRaw('id as product_id, name as product_name, price as product_price')->orderBy('price', 'DESC')->take(10)->get(); // Kolanlara takma isim vermek için
+    }
+
+    public
+    function custom2()
+    {
+        $products = Product::orderBy('price', 'DESC')->take(10)->get();
+
+        $mapped = $products->map(function ($product) {
+            return [
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'product_price' => $product->price
+            ];
+        });
+
+        return $mapped->all();
+    }
+
+    public
+    function custom3()
+    {
+        $products = Product::all();
+        ProductResource::withoutWrapping(); // Resource içinde data olarak dönmemesi için
+        return ProductResource::collection($products);
+    }
+
+    public
+    function listWithCategories()
+    {
+        $products = Product::with('category')->paginate(10);
+        return ProductWithCategoriesResource::collection($products);
     }
 }
