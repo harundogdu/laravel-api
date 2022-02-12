@@ -27,6 +27,7 @@ class UserFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => bcrypt('12345678'),
+            'api_token' => Str::random(60),
             'remember_token' => Str::random(10),
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
