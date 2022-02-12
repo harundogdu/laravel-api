@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UserStoreRequest extends BaseFormRequest
 {
-    /**
+    /*
      * Determine if the user is authorized to make this request.
      *
      * @return bool
@@ -24,8 +24,24 @@ class UserStoreRequest extends BaseFormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'email' => 'required|email|unique:users'
+            'name' => 'required|min:3',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8'
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'Name is required özel mesaj',
+            'email.required' => 'Email is required özel mesaj',
+            'password.required' => 'Password is required özel mesaj',
         ];
     }
 }

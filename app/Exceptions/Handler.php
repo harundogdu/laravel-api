@@ -2,8 +2,10 @@
 
 namespace App\Exceptions;
 
+use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\Api\ResultType;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -34,8 +36,11 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (NotFoundHttpException $e, $request) {
+            if ($request->is('api/*')) {
+                return
+                    (new ApiController())->apiResponse(ResultType::ERROR, 'Not Found Uri!', null, 404);
+            }
         });
     }
 }
