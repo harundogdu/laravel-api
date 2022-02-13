@@ -21,3 +21,4 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/upload', [App\Http\Controllers\HomeController::class, 'upload'])->name('upload');
+Route::get('/download/{fileName}', [App\Http\Controllers\HomeController::class, 'download'])->name('download');
