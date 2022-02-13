@@ -54,10 +54,17 @@ Route::post('/upload', \App\Http\Controllers\Api\UploadController::class . '@upl
 //Route::apiResource('/categories', \App\Http\Controllers\Api\CategoryController::class)->middleware('api_token');
 //Route::apiResource('/users', \App\Http\Controllers\Api\UserController::class)->middleware('api_token');
 
-Route::middleware('api_token')->group(function () {
+Route::middleware(['api_token'])->group(function () {
     Route::apiResources([
         "products" => \App\Http\Controllers\Api\ProductController::class,
         "categories" => \App\Http\Controllers\Api\CategoryController::class,
         "users" => \App\Http\Controllers\Api\UserController::class,
     ]);
+});
+
+Route::middleware('throttle:10,1')->get('/throttle', function () {
+    return response()->json([
+        'message' => 'Too Many Requests',
+        'status' => 429,
+    ], 429);
 });
