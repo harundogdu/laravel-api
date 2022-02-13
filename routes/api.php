@@ -48,12 +48,16 @@ Route::prefix('/users')->middleware('api_token')->group(function () {
     Route::get('/custom', \App\Http\Controllers\Api\UserController::class . '@custom');
 });
 
-Route::apiResource('/products', \App\Http\Controllers\Api\ProductController::class)->middleware('api_token');
-Route::apiResource('/categories', \App\Http\Controllers\Api\CategoryController::class)->middleware('api_token');
-Route::apiResource('/users', \App\Http\Controllers\Api\UserController::class)->middleware('api_token');
+Route::post('/upload', \App\Http\Controllers\Api\UploadController::class . '@upload');
 
-//Route::apiResources([
-//    "products" => \App\Http\Controllers\Api\ProductController::class,
-//    "categories" => \App\Http\Controllers\Api\CategoryController::class,
-//    "users" => \App\Http\Controllers\Api\UserController::class,
-//]);
+//Route::apiResource('/products', \App\Http\Controllers\Api\ProductController::class)->middleware('api_token');
+//Route::apiResource('/categories', \App\Http\Controllers\Api\CategoryController::class)->middleware('api_token');
+//Route::apiResource('/users', \App\Http\Controllers\Api\UserController::class)->middleware('api_token');
+
+Route::middleware('api_token')->group(function () {
+    Route::apiResources([
+        "products" => \App\Http\Controllers\Api\ProductController::class,
+        "categories" => \App\Http\Controllers\Api\CategoryController::class,
+        "users" => \App\Http\Controllers\Api\UserController::class,
+    ]);
+});
