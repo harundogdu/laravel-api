@@ -10,20 +10,29 @@ class UploadController extends Controller
 {
     public function upload(UploadImageRequest $request)
     {
-        try {
-            $file = $request->file('uploadFile');
-            //$name = $request->file('file')->getClientOriginalName();
-            $fileName = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('/uploads/'), $fileName);
+        if ($request->file('uploadFile')->isValid()) {
+            try {
+                $file = $request->file('uploadFile');
+                //$name = $request->file('file')->getClientOriginalName();
+                $fileName = time() . '.' . $file->getClientOriginalExtension();
+                //$file->move(public_path('/uploads/'), $fileName);
 
-            return response()->json([
-                'success' => true,
-                'data' => 'File uploaded successfully'
-            ], 200);
-        } catch (\Exception $e) {
+                $path = $file->storeAs('uploads/images', $fileName,'public');
+
+                return response()->json([
+                    'success' => true,
+                    'data' =>  asset('storage/'.$path),
+                ], 200);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $e->getMessage()
+                ], 400);
+            }
+        } else {
             return response()->json([
                 'success' => false,
-                'data' => $e->getMessage()
+                'data' => 'File is not valid'
             ], 400);
         }
     }
