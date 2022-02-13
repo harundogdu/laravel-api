@@ -42,13 +42,21 @@
                         }
                     })
                         .then(function (res) {
-                            output.className = 'container text-success h4';
-                            output.innerHTML = res.data.data;
-                            document.getElementById('uploadFile').value = '';
+                            if (res.data.success) {
+                                output.className = 'container text-success h4';
+                                output.innerHTML = res.data.data;
+                                document.getElementById('uploadFile').value = '';
+                            }
                         })
                         .catch(function (err) {
-                            output.className = 'container text-danger h4';
-                            output.innerHTML = err.data.data;
+                            output.className = 'container text-danger h3';
+                            output.innerHTML += "<ul>"
+                            for (var key in err.response.data.errors) {
+                                for (var i = 0; i < err.response.data.errors[key].length; i++) {
+                                    output.innerHTML += "<li>" + err.response.data.errors[key][i] + "</li>";
+                                }
+                            }
+                            output.innerHTML += "</ul>"
                         });
                 } else {
                     output.className = 'container text-danger h4';
