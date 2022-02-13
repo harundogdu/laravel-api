@@ -43,6 +43,7 @@ class Kernel extends HttpKernel
             'throttle:api',
             'api_logger',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\HttpHeader::class,
         ],
     ];
 
