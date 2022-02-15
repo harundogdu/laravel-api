@@ -37,10 +37,8 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->renderable(function (NotFoundHttpException $e, $request) {
-            if ($request->is('api/*')) {
-                return
-                    (new ApiController())->apiResponse(ResultType::ERROR, 'Not Found Uri!', null, 404);
-            }
+            if ($request->is('api/*')) return
+                (new ApiController())->apiResponse(ResultType::ERROR, 'Not Found Uri!', null, 404);
         });
     }
 }

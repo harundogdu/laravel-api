@@ -32,7 +32,7 @@ class ApiToken
             $user = User::where('api_token', $token)->first();
             if (!$user) {
                 return response()->json([
-                    'message' => 'Invalid Token!'
+                    'message' => 'User not found!'
                 ], 401);
             }
             auth()->login($user);
@@ -40,7 +40,7 @@ class ApiToken
         }
 
         return response()->json([
-            'message' => 'Invalid Token!'
+            'message' => "Unauthenticated."
         ], 401);
-    }
+   }
 }

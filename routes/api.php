@@ -33,18 +33,18 @@ Route::middleware('api_token')->group(function () {
     });
 });
 
-Route::prefix('/products')->middleware('api_token')->group(function () {
+Route::prefix('/products')->middleware('auth:api')->group(function () {
     Route::get('/custom', \App\Http\Controllers\Api\ProductController::class . '@custom');
     Route::get('/custom2', \App\Http\Controllers\Api\ProductController::class . '@custom2');
     Route::get('/custom3', \App\Http\Controllers\Api\ProductController::class . '@custom3');
     Route::get('/listwithcategories', \App\Http\Controllers\Api\ProductController::class . '@listWithCategories');
 });
 
-Route::prefix('/categories')->middleware('api_token')->group(function () {
+Route::prefix('/categories')->middleware('auth:api')->group(function () {
     Route::get('/custom', \App\Http\Controllers\Api\CategoryController::class . '@custom');
 });
 
-Route::prefix('/users')->middleware('api_token')->group(function () {
+Route::prefix('/users')->middleware('auth:api')->group(function () {
     Route::get('/custom', \App\Http\Controllers\Api\UserController::class . '@custom');
 });
 
@@ -54,7 +54,7 @@ Route::post('/upload', \App\Http\Controllers\Api\UploadController::class . '@upl
 //Route::apiResource('/categories', \App\Http\Controllers\Api\CategoryController::class)->middleware('api_token');
 //Route::apiResource('/users', \App\Http\Controllers\Api\UserController::class)->middleware('api_token');
 
-Route::middleware(['api_token'])->group(function () {
+Route::middleware(['auth:api'])->group(function () {
     Route::apiResources([
         "products" => \App\Http\Controllers\Api\ProductController::class,
         "categories" => \App\Http\Controllers\Api\CategoryController::class,

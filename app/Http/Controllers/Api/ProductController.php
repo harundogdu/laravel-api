@@ -9,12 +9,99 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+/**
+ * * @OA\Tag(
+ *     name="Products",
+ *     description="Operations about products",
+ *     @OA\ExternalDocumentation(
+ *     description="Find out more about our api",
+ *     url="https://github.com/harundogdu",
+ *     )
+ *)
+ * @OA\SecurityScheme(
+ *      type="apiKey",
+ *      name="api_token",
+ *      securityScheme="api_token",
+ *      in="query"
+ *)
+ *
+ * @OA\SecurityScheme(
+ *     type="http",
+ *     name="bearer",
+ *     securityScheme="bearer_token",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
+ * )
+ */
+
+
 class ProductController extends ApiController
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @OA\Get(
+     *     path="/products",
+     *     summary="Get all products",
+     *     tags={"Products"},
+     *     operationId="index",
+     *     @OA\Parameter (
+     *     name="search",
+     *     in="query",
+     *     description="Search query",
+     *     required=false,
+     *      @OA\Schema(type="string",format="string")
+     *     ),
+     *     @OA\Parameter (
+     *     name="limit",
+     *     in="query",
+     *     description="How many products to return",
+     *     required=false,
+     *     @OA\Schema(type="integer",format="int32")
+     *     ),
+     *     @OA\Parameter(
+     *      name="offset",
+     *      in="query",
+     *      description="How many products to skip",
+     *      required=false,
+     *     @OA\Schema(type="integer",format="int32")
+     *     ),
+     *     @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Product"))
+     *      ),
+     *     @OA\Response(
+     *          response=400,
+     *          description="Bad request",
+     *           @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *     @OA\Response(
+     *      response=401,
+     *      description="Unauthenticated",
+     *              @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *     @OA\Response(
+     *      response=403,
+     *      description="Forbidden",
+     *              @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *     ),
+     *     @OA\Response(
+     *      response=404,
+     *      description="Resource Not Found",
+     *          @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *     @OA\Response (
+     *      response="default",
+     *      description="unexpected error",
+     *       @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *      security={{"api_token": {}},{"bearer_token": {}}}
+     *
+     * )
+     *
      */
     public function index(Request $request)
     {
@@ -26,8 +113,8 @@ class ProductController extends ApiController
         $limit = $request->has('limit') ? $request->limit : 10;
 
         $qb = Product::query()->with('category');
-        if ($request->has('q')) {
-            $qb->where('name', 'like', '%' . $request->q . '%');
+        if ($request->has('search')) {
+            $qb->where('name', 'like', '%' . $request->search . '%');
         }
         if ($request->has('sort')) {
             $qb->orderBy($request->query('sortBy'), $request->query('sort', 'desc'));
@@ -45,7 +132,36 @@ class ProductController extends ApiController
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
+     *
+     * @OA\Post (
+     *     path="/products",
+     *     summary="Create a new product",
+     *     tags={"Products"},
+     *     operationId="store",
+     *     @OA\RequestBody(
+     *        description="Product object that needs to be added to the store",
+     *        required=true,
+     *        @OA\JsonContent(ref="#/components/schemas/Product")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *)
      */
+
     public function store(Request $request)
     {
         try {
@@ -70,6 +186,36 @@ class ProductController extends ApiController
      *
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     * @OA\Get(
+     *     path="/products/{productId}",
+     *     summary="Get a product",
+     *     tags={"Products"},
+     *     operationId="show",
+     *     @OA\Parameter (
+     *     name="productId",
+     *     in="path",
+     *     description="Product id",
+     *     required=true,
+     *      @OA\Schema(type="integer",format="int16")
+     *     ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *)
      */
     public function show($id)
     {
@@ -78,7 +224,6 @@ class ProductController extends ApiController
             return $this->apiResponse(ResultType::SUCCESS, new ProductResource($product), "Product was fetched successfully", 200);
         else
             return $this->apiResponse(ResultType::SUCCESS, null, "Product not found", 404);
-
     }
 
     /**
@@ -87,6 +232,46 @@ class ProductController extends ApiController
      * @param \Illuminate\Http\Request $request
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     * @OA\Put  (
+     *     path="/products/{productId}",
+     *     summary="Update a product",
+     *     tags={"Products"},
+     *     operationId="update",
+     *      @OA\Parameter (
+     *     name="productId",
+     *     in="path",
+     *     description="Product id",
+     *     required=true,
+     *      @OA\Schema(type="integer",format="int16")
+     *     ),
+     *     @OA\RequestBody(
+     *        description="Product object that needs to be added to the store",
+     *        required=true,
+     *        @OA\JsonContent(ref="#/components/schemas/Product")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *      response=500,
+     *      description="Internal Server Error",
+     *      @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *)
      */
     public function update(Request $request, $id)
     {
@@ -111,6 +296,41 @@ class ProductController extends ApiController
      *
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     * @OA\Delete(
+     *     path="/products/{productId}",
+     *     summary="Delete a product",
+     *     tags={"Products"},
+     *     operationId="delete",
+     *       @OA\Parameter (
+     *     name="productId",
+     *     in="path",
+     *     description="Product id",
+     *     required=true,
+     *      @OA\Schema(type="integer",format="int16")
+     *     ),
+     *     @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *      response=500,
+     *      description="Internal Server Error",
+     *      @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *  )
      */
     public function destroy($id)
     {
@@ -129,8 +349,7 @@ class ProductController extends ApiController
         return Product::selectRaw('id as product_id, name as product_name, price as product_price')->orderBy('price', 'DESC')->take(10)->get(); // Kolanlara takma isim vermek için
     }
 
-    public
-    function custom2()
+    public function custom2()
     {
         $products = Product::orderBy('price', 'DESC')->take(10)->get();
 
@@ -145,16 +364,14 @@ class ProductController extends ApiController
         return $mapped->all();
     }
 
-    public
-    function custom3()
+    public function custom3()
     {
         $products = Product::all();
         ProductResource::withoutWrapping(); // Resource içinde data olarak dönmemesi için
         return ProductResource::collection($products);
     }
 
-    public
-    function listWithCategories()
+    public function listWithCategories()
     {
         $products = Product::with('category')->paginate(10);
         return ProductWithCategoriesResource::collection($products);

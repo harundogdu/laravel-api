@@ -6,6 +6,28 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+/**
+ * @OA\Schema(
+ *     description="User model",
+ *     title="User",
+ *     type="object",
+ *     schema="User",
+ *     properties={
+ *           @OA\Property(type="integer", property="id"),
+ *           @OA\Property(type="string", property="name"),
+ *           @OA\Property(type="string", property="email"),
+ *           @OA\Property(type="datetime", property="email_verified_at"),
+ *           @OA\Property(type="string", property="api_token"),
+ *           @OA\Property(type="string", property="first_name"),
+ *           @OA\Property(type="string", property="last_name"),
+ *           @OA\Property(type="integer", property="rate_limit"),
+ *           @OA\Property(type="datetime", property="created_at"),
+ *           @OA\Property(type="datetime", property="updated_at"),
+ *           @OA\Property(type="string", property="full_name"),
+ *     },
+ * )
+ */
+
 
 class User extends Authenticatable
 {

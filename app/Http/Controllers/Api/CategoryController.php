@@ -8,6 +8,16 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+/**
+ *@OA\Tag(
+ *     name="Categories",
+ *     description="Operations about categories",
+ *     @OA\ExternalDocumentation(
+ *     description="Find out more about our api",
+ *     url="https://github.com/harundogdu",
+ *     )
+ *)
+ */
 
 class CategoryController extends Controller
 {
@@ -15,6 +25,66 @@ class CategoryController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\JsonResponse
+     *
+     * * @OA\Get(
+     *     path="/categories",
+     *     summary="Get all categories",
+     *     tags={"Categories"},
+     *     operationId="index",
+     *     @OA\Parameter (
+     *     name="search",
+     *     in="query",
+     *     description="Search query",
+     *     required=false,
+     *      @OA\Schema(type="string",format="string")
+     *     ),
+     *     @OA\Parameter (
+     *     name="limit",
+     *     in="query",
+     *     description="How many products to return",
+     *     required=false,
+     *     @OA\Schema(type="integer",format="int32")
+     *     ),
+     *     @OA\Parameter(
+     *      name="offset",
+     *      in="query",
+     *      description="How many products to skip",
+     *      required=false,
+     *     @OA\Schema(type="integer",format="int32")
+     *     ),
+     *     @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Product"))
+     *      ),
+     *     @OA\Response(
+     *          response=400,
+     *          description="Bad request",
+     *           @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *     @OA\Response(
+     *      response=401,
+     *      description="Unauthenticated",
+     *              @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *     @OA\Response(
+     *      response=403,
+     *      description="Forbidden",
+     *              @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *     ),
+     *     @OA\Response(
+     *      response=404,
+     *      description="Resource Not Found",
+     *          @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *     @OA\Response (
+     *      response="default",
+     *      description="unexpected error",
+     *       @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *      security={{"api_token": {}},{"bearer_token": {}}}
+     *
+     * )
      */
     public function index(Request $request)
     {
@@ -38,6 +108,34 @@ class CategoryController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
+     *
+     * * @OA\Post (
+     *     path="/categories",
+     *     summary="Create a new category",
+     *     tags={"Categories"},
+     *     operationId="store",
+     *     @OA\RequestBody(
+     *        description="Product object that needs to be added to the store",
+     *        required=true,
+     *        @OA\JsonContent(ref="#/components/schemas/Category")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *)
      */
     public function store(Request $request)
     {
@@ -61,6 +159,37 @@ class CategoryController extends Controller
      *
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     *
+     * * @OA\Get(
+     *     path="/categories/{categoryId}",
+     *     summary="Get a category",
+     *     tags={"Categories"},
+     *     operationId="show",
+     *     @OA\Parameter (
+     *     name="categoryId",
+     *     in="path",
+     *     description="Category id",
+     *     required=true,
+     *      @OA\Schema(type="integer",format="int16")
+     *     ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *)
      */
     public function show($id)
     {
@@ -80,6 +209,46 @@ class CategoryController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     *  * @OA\Put  (
+     *     path="/categories/{categoryId}",
+     *     summary="Update a category",
+     *     tags={"Categories"},
+     *     operationId="update",
+     *      @OA\Parameter (
+     *     name="categoryId",
+     *     in="path",
+     *     description="Category id",
+     *     required=true,
+     *      @OA\Schema(type="integer",format="int16")
+     *     ),
+     *     @OA\RequestBody(
+     *        description="Product object that needs to be added to the store",
+     *        required=true,
+     *        @OA\JsonContent(ref="#/components/schemas/Product")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *      response=500,
+     *      description="Internal Server Error",
+     *      @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *)
      */
     public function update(Request $request, $id)
     {
@@ -102,6 +271,41 @@ class CategoryController extends Controller
      *
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     * * @OA\Delete(
+     *     path="/categories/{categoryId}",
+     *     summary="Delete a category",
+     *     tags={"Categories"},
+     *     operationId="delete",
+     *       @OA\Parameter (
+     *     name="categoryId",
+     *     in="path",
+     *     description="Category id",
+     *     required=true,
+     *      @OA\Schema(type="integer",format="int16")
+     *     ),
+     *     @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *      response=500,
+     *      description="Internal Server Error",
+     *      @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *  )
      */
     public function destroy($id)
     {

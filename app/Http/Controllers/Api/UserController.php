@@ -9,12 +9,62 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
+/**
+ * * @OA\Tag(
+ *     name="Users",
+ *     description="Operations about users",
+ *     @OA\ExternalDocumentation(
+ *     description="Find out more about our api",
+ *     url="https://github.com/harundogdu",
+ *     )
+ *)
+ */
+
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\JsonResponse
+     *
+     *     * @OA\Get(
+     *     path="/users",
+     *     summary="Get all users",
+     *     tags={"Users"},
+     *     operationId="index",
+     *     @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
+     *      ),
+     *     @OA\Response(
+     *          response=400,
+     *          description="Bad request",
+     *           @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *     @OA\Response(
+     *      response=401,
+     *      description="Unauthenticated",
+     *              @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *     @OA\Response(
+     *      response=403,
+     *      description="Forbidden",
+     *              @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *     ),
+     *     @OA\Response(
+     *      response=404,
+     *      description="Resource Not Found",
+     *          @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *     @OA\Response (
+     *      response="default",
+     *      description="unexpected error",
+     *       @OA\JsonContent(type="object", @OA\Property(property="message", type="string"))
+     *      ),
+     *      security={{"api_token": {}},{"bearer_token": {}}}
+     *
+     * )
      */
     public function index()
     {
@@ -28,6 +78,34 @@ class UserController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
+     *
+     *  @OA\Post (
+     *     path="/users",
+     *     summary="Create a new user",
+     *     tags={"Users"},
+     *     operationId="store",
+     *     @OA\RequestBody(
+     *        description="Product object that needs to be added to the store",
+     *        required=true,
+     *        @OA\JsonContent(ref="#/components/schemas/User")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *)
      */
     public function store(UserStoreRequest $request)
     {
@@ -48,6 +126,36 @@ class UserController extends Controller
      *
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     * * @OA\Get(
+     *     path="/users/{userId}",
+     *     summary="Get a user",
+     *     tags={"Users"},
+     *     operationId="show",
+     *     @OA\Parameter (
+     *     name="userId",
+     *     in="path",
+     *     description="User id",
+     *     required=true,
+     *      @OA\Schema(type="integer",format="int16")
+     *     ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *)
      */
     public function show($id)
     {
@@ -65,6 +173,46 @@ class UserController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     * * @OA\Put  (
+     *     path="/users/{usersId}",
+     *     summary="Update a users",
+     *     tags={"Users"},
+     *     operationId="update",
+     *      @OA\Parameter (
+     *     name="usersId",
+     *     in="path",
+     *     description="User id",
+     *     required=true,
+     *      @OA\Schema(type="integer",format="int16")
+     *     ),
+     *     @OA\RequestBody(
+     *        description="Product object that needs to be added to the store",
+     *        required=true,
+     *        @OA\JsonContent(ref="#/components/schemas/User")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *      response=500,
+     *      description="Internal Server Error",
+     *      @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *)
      */
     public function update(Request $request, $id)
     {
@@ -87,6 +235,41 @@ class UserController extends Controller
      *
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     * * @OA\Delete(
+     *     path="/users/{userId}",
+     *     summary="Delete a user",
+     *     tags={"Users"},
+     *     operationId="delete",
+     *       @OA\Parameter (
+     *     name="userId",
+     *     in="path",
+     *     description="Product id",
+     *     required=true,
+     *      @OA\Schema(type="integer",format="int16")
+     *     ),
+     *     @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *           @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *     response=404,
+     *     description="Resource Not Found",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     @OA\Response(
+     *      response=500,
+     *      description="Internal Server Error",
+     *      @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/ApiResponse"))
+     *      ),
+     *     security={{"api_token": {}},{"bearer_token": {}}}
+     *  )
      */
     public function destroy($id)
     {
